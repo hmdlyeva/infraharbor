@@ -24,8 +24,7 @@ public static class DependencyInjection
                 options.User.RequireUniqueEmail = true;
             })
             .AddRoles<ApplicationRole>()
-            .AddEntityFrameworkStores<InfraHarborDbContext>()
-            .AddSignInManager();
+            .AddEntityFrameworkStores<InfraHarborDbContext>();
 
         return services;
     }
