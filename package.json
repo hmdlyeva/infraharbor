@@ -1,0 +1,8 @@
+{
+  "name":"infraharbor",
+  "version":"0.0.3",
+  "private":true,
+  "packageManager":"pnpm@11.25.0",
+  "engines":{"node":">=24 <25","pnpm":">=11 <12"},
+  "scripts":{"dev:web":"pnpm --filter @infraharbor/web dev","build:web":"pnpm --filter @infraharbor/web build","lint:web":"pnpm --filter @infraharbor/web lint","typecheck:web":"pnpm --filter @infraharbor/web typecheck","validate":"./scripts/validate.sh"}
+}
