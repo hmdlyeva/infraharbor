@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/InfraHarbor.Domain/InfraHarbor.Domain.csproj" />
+  <Project Path="src/InfraHarbor.Application/InfraHarbor.Application.csproj" />
+  <Project Path="src/InfraHarbor.Infrastructure/InfraHarbor.Infrastructure.csproj" />
+  <Project Path="src/InfraHarbor.Api/InfraHarbor.Api.csproj" />
+  <Project Path="src/InfraHarbor.Worker/InfraHarbor.Worker.csproj" />
+  <Project Path="tests/InfraHarbor.UnitTests/InfraHarbor.UnitTests.csproj" />
+</Solution>

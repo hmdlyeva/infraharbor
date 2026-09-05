@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../InfraHarbor.Application/InfraHarbor.Application.csproj" />
+    <ProjectReference Include="../InfraHarbor.Infrastructure/InfraHarbor.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

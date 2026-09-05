@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../InfraHarbor.Application/InfraHarbor.Application.csproj" />
+    <ProjectReference Include="../InfraHarbor.Domain/InfraHarbor.Domain.csproj" />
+  </ItemGroup>
+</Project>
