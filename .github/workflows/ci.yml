@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -61,8 +61,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref == 'task/IH-011-identity-schema' && github.head_ref || github.sha }}
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
         with:
@@ -75,19 +73,5 @@ jobs:
         run: dotnet build InfraHarbor.slnx --configuration Release --no-restore
       - name: Test
         run: dotnet test InfraHarbor.slnx --configuration Release --no-build --verbosity normal
-      - name: Generate initial identity migration
-        if: github.event_name == 'pull_request' && github.head_ref == 'task/IH-011-identity-schema'
-        run: |
-          if [ ! -f src/InfraHarbor.Infrastructure/Persistence/Migrations/InfraHarborDbContextModelSnapshot.cs ]; then
-            dotnet ef migrations add InitialIdentity --project src/InfraHarbor.Infrastructure --startup-project src/InfraHarbor.Api --output-dir Persistence/Migrations --configuration Release --no-build
-          fi
-      - name: Commit generated identity migration
-        if: github.event_name == 'pull_request' && github.head_ref == 'task/IH-011-identity-schema'
-        run: |
-          if ! git diff --quiet -- src/InfraHarbor.Infrastructure/Persistence/Migrations || [ -n "$(git ls-files --others --exclude-standard src/InfraHarbor.Infrastructure/Persistence/Migrations)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add src/InfraHarbor.Infrastructure/Persistence/Migrations
-            git commit -m "feat(identity): add generated initial migration [IH-011]"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
+      - name: Verify EF model matches committed migrations
+        run: dotnet ef migrations has-pending-model-changes --project src/InfraHarbor.Infrastructure --startup-project src/InfraHarbor.Api --configuration Release --no-build
