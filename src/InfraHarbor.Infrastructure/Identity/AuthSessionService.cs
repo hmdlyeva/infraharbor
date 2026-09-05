@@ -42,7 +42,7 @@ public sealed class AuthSessionService(
         db.RefreshSessions.Add(session);
         await db.SaveChangesAsync(cancellationToken);
 
-        return Authenticated(user, rawToken, session.ExpiresAt);
+        return await AuthenticatedAsync(user, rawToken, session.ExpiresAt);
     }
 
     public async Task<AuthSessionResult> RefreshAsync(
@@ -101,7 +101,7 @@ public sealed class AuthSessionService(
         await db.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return Authenticated(user, rawToken, nextSession.ExpiresAt);
+        return await AuthenticatedAsync(user, rawToken, nextSession.ExpiresAt);
     }
 
     public async Task RevokeAsync(string refreshToken, CancellationToken cancellationToken)
@@ -171,17 +171,25 @@ public sealed class AuthSessionService(
                 cancellationToken);
     }
 
-    private static AuthSessionResult Authenticated(
+    private async Task<AuthSessionResult> AuthenticatedAsync(
         ApplicationUser user,
         string refreshToken,
-        DateTimeOffset refreshExpiresAt) =>
-        new(
+        DateTimeOffset refreshExpiresAt)
+    {
+        var roles = (await userManager.GetRolesAsync(user))
+            .Where(role => RoleNames.All.Contains(role))
+            .OrderBy(role => role, StringComparer.Ordinal)
+            .ToArray();
+
+        return new AuthSessionResult(
             AuthSessionOutcome.Authenticated,
             user.Id,
             user.Email,
             user.DisplayName,
             refreshToken,
-            refreshExpiresAt);
+            refreshExpiresAt,
+            roles);
+    }
 
     private static AuthSessionResult Rejected() => new(AuthSessionOutcome.Rejected);
 

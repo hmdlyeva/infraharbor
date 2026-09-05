@@ -23,7 +23,8 @@ public sealed record AuthSessionResult(
     string? Email = null,
     string? DisplayName = null,
     string? RefreshToken = null,
-    DateTimeOffset? RefreshExpiresAt = null);
+    DateTimeOffset? RefreshExpiresAt = null,
+    IReadOnlyList<string>? Roles = null);
 
 public interface IAuthSessionService
 {
