@@ -2,6 +2,7 @@ using InfraHarbor.Application.Security;
 using InfraHarbor.Infrastructure.Identity;
 using InfraHarbor.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace InfraHarbor.UnitTests;
 
