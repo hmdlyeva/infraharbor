@@ -4,6 +4,7 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageReference Include="xunit.v3" Version="4.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
@@ -13,7 +14,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/InfraHarbor.Application/InfraHarbor.Application.csproj" />
-    <ProjectReference Include="../../src/InfraHarbor.Domain/InfraHarbor.Domain.csproj" />
     <ProjectReference Include="../../src/InfraHarbor.Infrastructure/InfraHarbor.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

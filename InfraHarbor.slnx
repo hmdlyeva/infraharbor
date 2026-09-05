@@ -5,4 +5,5 @@
   <Project Path="src/InfraHarbor.Api/InfraHarbor.Api.csproj" />
   <Project Path="src/InfraHarbor.Worker/InfraHarbor.Worker.csproj" />
   <Project Path="tests/InfraHarbor.UnitTests/InfraHarbor.UnitTests.csproj" />
+  <Project Path="tests/InfraHarbor.IntegrationTests/InfraHarbor.IntegrationTests.csproj" />
 </Solution>

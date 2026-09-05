@@ -1,7 +1,18 @@
 using InfraHarbor.Api;
+using InfraHarbor.Application;
+using InfraHarbor.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfraHarborConfiguration(builder.Configuration);
+
+var databaseOptions = new DatabaseOptions
+{
+    ConnectionString = builder.Configuration.GetConnectionString(DatabaseOptions.ConnectionStringName)
+        ?? throw new InvalidOperationException("ConnectionStrings:Database is required.")
+};
+
+builder.Services.AddInfraHarborPersistence(databaseOptions.ConnectionString);
+builder.Services.AddInfraHarborIdentity();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
