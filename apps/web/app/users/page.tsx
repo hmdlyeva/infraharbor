@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/auth";
@@ -41,8 +42,6 @@ export default function UsersPage() {
   }, [canManageUsers, router, status]);
 
   const loadUsers = useCallback(async () => {
-    setLoadingUsers(true);
-    setError(null);
     const response = await authenticatedFetch("/api/users/", { cache: "no-store" });
     if (!response.ok) {
       setLoadingUsers(false);
@@ -132,11 +131,17 @@ export default function UsersPage() {
     await loadUsers();
   }
 
+  async function handleRefresh() {
+    setLoadingUsers(true);
+    setError(null);
+    await loadUsers();
+  }
+
   return (
     <main className="admin-page">
       <header className="admin-topbar">
         <div>
-          <a className="back-link" href="/">← Overview</a>
+          <Link className="back-link" href="/">← Overview</Link>
           <span className="eyebrow">IDENTITY / USERS</span>
           <h1>Users &amp; roles</h1>
           <p>Manage installation users without exposing ownership transfer through the generic admin flow.</p>
@@ -184,7 +189,7 @@ export default function UsersPage() {
         <article className="panel admin-list-panel">
           <div className="panel-heading">
             <div><span className="eyebrow">INSTALLATION</span><h2>Current users</h2></div>
-            <button type="button" onClick={() => void loadUsers()}>Refresh</button>
+            <button type="button" onClick={() => void handleRefresh()}>Refresh</button>
           </div>
 
           {loadingUsers ? (
