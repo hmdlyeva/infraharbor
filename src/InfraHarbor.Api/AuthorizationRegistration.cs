@@ -1,5 +1,5 @@
 using InfraHarbor.Application.Security;
-using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace InfraHarbor.Api;
