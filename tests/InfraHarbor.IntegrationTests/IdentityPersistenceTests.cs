@@ -14,6 +14,7 @@ public sealed class IdentityPersistenceTests
     [Fact]
     public async Task InitialMigration_AllowsCreatingUserAndRoleOnPostgres()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Database");
         Assert.False(string.IsNullOrWhiteSpace(connectionString), "ConnectionStrings__Database is required for integration tests.");
 
@@ -26,8 +27,8 @@ public sealed class IdentityPersistenceTests
         await using var scope = provider.CreateAsyncScope();
 
         var db = scope.ServiceProvider.GetRequiredService<InfraHarborDbContext>();
-        await db.Database.EnsureDeletedAsync();
-        await db.Database.MigrateAsync();
+        await db.Database.EnsureDeletedAsync(cancellationToken);
+        await db.Database.MigrateAsync(cancellationToken);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -57,7 +58,9 @@ public sealed class IdentityPersistenceTests
         Assert.True(roleAssignment.Succeeded, FormatErrors(roleAssignment));
         Assert.True(await userManager.IsInRoleAsync(user, RoleNames.Owner));
 
-        var persisted = await db.Users.SingleAsync(candidate => candidate.NormalizedEmail == email.ToUpperInvariant());
+        var persisted = await db.Users.SingleAsync(
+            candidate => candidate.NormalizedEmail == email.ToUpperInvariant(),
+            cancellationToken);
         Assert.Equal("Integration Owner", persisted.DisplayName);
         Assert.Equal(UserStatus.Active, persisted.Status);
     }
