@@ -56,10 +56,35 @@ export default function UsersPage() {
   }, [authenticatedFetch]);
 
   useEffect(() => {
-    if (status === "authenticated" && canManageUsers) {
-      void loadUsers();
+    if (status !== "authenticated" || !canManageUsers) {
+      return;
     }
-  }, [canManageUsers, loadUsers, status]);
+
+    let cancelled = false;
+    void authenticatedFetch("/api/users/", { cache: "no-store" }).then(async (response) => {
+      if (cancelled) {
+        return;
+      }
+
+      if (!response.ok) {
+        setLoadingUsers(false);
+        if (response.status !== 401) {
+          setError("Unable to load users.");
+        }
+        return;
+      }
+
+      const nextUsers = (await response.json()) as ManagedUser[];
+      if (!cancelled) {
+        setUsers(nextUsers);
+        setLoadingUsers(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authenticatedFetch, canManageUsers, status]);
 
   if (status !== "authenticated" || !user || !canManageUsers) {
     return (
