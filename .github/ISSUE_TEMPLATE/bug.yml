@@ -1,0 +1,29 @@
+name: Bug report
+description: Report reproducible non-security behavior
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not use this form for security vulnerabilities or include secrets/private infrastructure data."
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS/runtime details without secrets or private host information.
