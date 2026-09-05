@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using InfraHarbor.Application;
 using InfraHarbor.Application.Security;
 using Microsoft.AspNetCore.RateLimiting;
@@ -20,6 +22,8 @@ internal static class AuthEndpoints
         endpoints.MapPost("/api/auth/refresh", RefreshAsync)
             .RequireRateLimiting(AuthRateLimitPolicies.Refresh);
         endpoints.MapPost("/api/auth/logout", LogoutAsync);
+        endpoints.MapGet("/api/auth/me", Me)
+            .RequireAuthorization(AuthorizationPolicyNames.Authenticated);
         return endpoints;
     }
 
@@ -153,6 +157,27 @@ internal static class AuthEndpoints
 
         DeleteRefreshCookie(httpContext, options);
         return Results.NoContent();
+    }
+
+    private static IResult Me(ClaimsPrincipal principal)
+    {
+        var subject = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+        var displayName = principal.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
+
+        if (!Guid.TryParse(subject, out var userId) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(displayName))
+        {
+            return Results.Unauthorized();
+        }
+
+        var roles = principal.FindAll(ClaimTypes.Role)
+            .Select(claim => claim.Value)
+            .Where(role => RoleNames.All.Contains(role))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(role => role, StringComparer.Ordinal)
+            .ToArray();
+
+        return Results.Ok(new { id = userId, email, displayName, roles });
     }
 
     private static AuthSessionMetadata GetMetadata(HttpContext httpContext) =>
