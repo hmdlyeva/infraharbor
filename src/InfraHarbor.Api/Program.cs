@@ -19,6 +19,7 @@ var app = builder.Build();
 
 app.MapHealthChecks("/health/live");
 app.MapHealthChecks("/health/ready");
+app.MapAuthEndpoints();
 
 app.MapGet("/", () => Results.Ok(new
 {
