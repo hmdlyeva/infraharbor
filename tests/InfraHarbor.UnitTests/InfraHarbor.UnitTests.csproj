@@ -14,5 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/InfraHarbor.Application/InfraHarbor.Application.csproj" />
     <ProjectReference Include="../../src/InfraHarbor.Domain/InfraHarbor.Domain.csproj" />
+    <ProjectReference Include="../../src/InfraHarbor.Infrastructure/InfraHarbor.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
