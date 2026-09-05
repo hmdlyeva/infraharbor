@@ -13,6 +13,7 @@ var databaseOptions = new DatabaseOptions
 
 builder.Services.AddInfraHarborPersistence(databaseOptions.ConnectionString);
 builder.Services.AddInfraHarborIdentity();
+builder.Services.AddInfraHarborCors(builder.Configuration);
 builder.Services.AddInfraHarborAuthentication(builder.Configuration);
 builder.Services.AddInfraHarborAuthorization();
 builder.Services.AddInfraHarborRateLimiting();
@@ -20,6 +21,7 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();

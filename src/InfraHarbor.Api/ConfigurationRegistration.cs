@@ -53,6 +53,31 @@ public static class ConfigurationRegistration
         return services;
     }
 
+    public static IServiceCollection AddInfraHarborCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        var publicUrl = configuration[$"{RuntimeOptions.SectionName}:PublicUrl"];
+        if (!Uri.TryCreate(publicUrl, UriKind.Absolute, out var publicUri) ||
+            (publicUri.Scheme != Uri.UriSchemeHttp && publicUri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new InvalidOperationException("Runtime:PublicUrl must be configured before browser CORS can be registered.");
+        }
+
+        var browserOrigin = publicUri.GetLeftPart(UriPartial.Authority);
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .WithOrigins(browserOrigin)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
+
+        return services;
+    }
+
     public static IServiceCollection AddInfraHarborAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var auth = new AuthOptions();

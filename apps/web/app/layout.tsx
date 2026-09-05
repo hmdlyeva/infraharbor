@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { AuthProvider } from "../lib/auth";
 import "./globals.css";
+import "./auth.css";
 
 export const metadata: Metadata = {
   title: "InfraHarbor",
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><AuthProvider>{children}</AuthProvider></body>
     </html>
   );
 }
