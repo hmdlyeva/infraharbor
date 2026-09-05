@@ -75,7 +75,7 @@ jobs:
         run: dotnet test InfraHarbor.slnx --configuration Release --no-build --verbosity normal
       - name: Generate initial identity migration preview
         if: github.event_name == 'pull_request' && github.head_ref == 'task/IH-011-identity-schema'
-        run: dotnet ef migrations add InitialIdentity --project src/InfraHarbor.Infrastructure --startup-project src/InfraHarbor.Api --output-dir Persistence/Migrations --no-build
+        run: dotnet ef migrations add InitialIdentity --project src/InfraHarbor.Infrastructure --startup-project src/InfraHarbor.Api --output-dir Persistence/Migrations --configuration Release --no-build
       - name: Upload migration preview
         if: github.event_name == 'pull_request' && github.head_ref == 'task/IH-011-identity-schema'
         uses: actions/upload-artifact@v4
