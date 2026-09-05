@@ -25,8 +25,11 @@ public sealed class IdentityModelTests
         var userType = context.Model.FindEntityType(typeof(ApplicationUser));
 
         Assert.NotNull(userType);
-        var emailIndex = Assert.Single(userType!.GetIndexes().Where(index =>
-            index.Properties.Select(property => property.Name).SequenceEqual([nameof(ApplicationUser.NormalizedEmail)])));
+        var emailIndex = Assert.Single(
+            userType!.GetIndexes(),
+            index => index.Properties.Select(property => property.Name)
+                .SequenceEqual([nameof(ApplicationUser.NormalizedEmail)]));
+
         Assert.True(emailIndex.IsUnique);
     }
 
