@@ -1,3 +1,4 @@
+using InfraHarbor.Application.Security;
 using InfraHarbor.Infrastructure.Identity;
 using InfraHarbor.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +27,7 @@ public static class DependencyInjection
             .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<InfraHarborDbContext>();
 
+        services.AddScoped<IOwnerBootstrapService, OwnerBootstrapService>();
         return services;
     }
 }

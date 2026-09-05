@@ -12,6 +12,13 @@ internal static class ConfigurationRegistration
             .Validate(static options => Uri.TryCreate(options.PublicUrl, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps), "Runtime:PublicUrl must be an absolute HTTP(S) URL")
             .ValidateOnStart();
 
+        services.AddOptions<BootstrapOptions>()
+            .Bind(configuration.GetSection(BootstrapOptions.SectionName))
+            .Validate(
+                static options => !options.Enabled || (!string.IsNullOrWhiteSpace(options.Token) && options.Token.Length >= 32),
+                "Bootstrap:Token must contain at least 32 characters when bootstrap is enabled")
+            .ValidateOnStart();
+
         var connectionString = configuration.GetConnectionString(DatabaseOptions.ConnectionStringName);
         if (string.IsNullOrWhiteSpace(connectionString))
         {
