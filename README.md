@@ -55,6 +55,10 @@ Run the prerequisite check:
 ./scripts/check-tooling.sh
 ```
 
+## Validation
+
+Every push to `main` and every pull request runs the GitHub Actions CI workflow for web and .NET validation.
+
 ## Security model
 
 InfraHarbor will operate against real infrastructure, so security boundaries are part of the product architecture:
