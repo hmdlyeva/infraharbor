@@ -13,9 +13,15 @@ var databaseOptions = new DatabaseOptions
 
 builder.Services.AddInfraHarborPersistence(databaseOptions.ConnectionString);
 builder.Services.AddInfraHarborIdentity();
+builder.Services.AddInfraHarborAuthentication(builder.Configuration);
+builder.Services.AddInfraHarborRateLimiting();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health/live");
 app.MapHealthChecks("/health/ready");

@@ -59,6 +59,12 @@ Run the prerequisite check:
 
 Every push to `main` and every pull request runs the GitHub Actions CI workflow for web and .NET validation.
 
+## Authentication configuration
+
+The API fails closed unless `Auth__SigningKey` is configured with a deployment-specific secret containing at least 32 UTF-8 bytes. Do not commit that value. The remaining authentication settings have documented defaults in `.env.example`, including issuer/audience, access-token lifetime, refresh-session lifetime, cookie name and clock skew.
+
+Refresh tokens are opaque credentials stored only as SHA-256 hashes in PostgreSQL. Browser clients receive the raw refresh credential only through an HttpOnly cookie. Set `Auth__SecureCookies=true` for HTTPS deployments; local HTTP development may set it to `false`.
+
 ## Security model
 
 InfraHarbor will operate against real infrastructure, so security boundaries are part of the product architecture:

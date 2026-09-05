@@ -21,3 +21,24 @@ public sealed class BootstrapOptions
 
     public string? Token { get; set; }
 }
+
+public sealed class AuthOptions
+{
+    public const string SectionName = "Auth";
+
+    public string Issuer { get; set; } = "InfraHarbor";
+
+    public string Audience { get; set; } = "InfraHarbor.Api";
+
+    public string? SigningKey { get; set; }
+
+    public int AccessTokenLifetimeSeconds { get; set; } = 900;
+
+    public int RefreshTokenLifetimeDays { get; set; } = 30;
+
+    public int ClockSkewSeconds { get; set; } = 30;
+
+    public string RefreshCookieName { get; set; } = "infraharbor_refresh";
+
+    public bool SecureCookies { get; set; } = true;
+}
