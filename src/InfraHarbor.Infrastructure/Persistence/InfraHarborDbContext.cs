@@ -8,6 +8,8 @@ namespace InfraHarbor.Infrastructure.Persistence;
 public sealed class InfraHarborDbContext(DbContextOptions<InfraHarborDbContext> options)
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
 {
+    public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -53,6 +55,32 @@ public sealed class InfraHarborDbContext(DbContextOptions<InfraHarborDbContext> 
             entity.Property(role => role.NormalizedName)
                 .HasMaxLength(256)
                 .IsRequired();
+        });
+
+        builder.Entity<RefreshSession>(entity =>
+        {
+            entity.ToTable("RefreshSessions");
+            entity.HasKey(session => session.Id);
+
+            entity.Property(session => session.TokenHash)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            entity.Property(session => session.UserAgent)
+                .HasMaxLength(512);
+
+            entity.Property(session => session.IpAddress)
+                .HasMaxLength(64);
+
+            entity.HasIndex(session => session.TokenHash)
+                .IsUnique();
+
+            entity.HasIndex(session => session.FamilyId);
+
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(session => session.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<IdentityUserLogin<Guid>>().Property(login => login.LoginProvider).HasMaxLength(128);

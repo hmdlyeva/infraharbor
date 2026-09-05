@@ -29,6 +29,16 @@ services:
       ConnectionStrings__Database: Host=postgres;Port=5432;Database=${POSTGRES_DB:-infraharbor};Username=${POSTGRES_USER:-infraharbor};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       Runtime__DeploymentName: ${Runtime__DeploymentName:-InfraHarbor Local}
       Runtime__PublicUrl: ${Runtime__PublicUrl:-http://localhost:3000}
+      Bootstrap__Enabled: ${Bootstrap__Enabled:-false}
+      Bootstrap__Token: ${Bootstrap__Token:-}
+      Auth__Issuer: ${Auth__Issuer:-InfraHarbor}
+      Auth__Audience: ${Auth__Audience:-InfraHarbor.Api}
+      Auth__SigningKey: ${Auth__SigningKey:?Auth__SigningKey is required}
+      Auth__AccessTokenLifetimeSeconds: ${Auth__AccessTokenLifetimeSeconds:-900}
+      Auth__RefreshTokenLifetimeDays: ${Auth__RefreshTokenLifetimeDays:-30}
+      Auth__ClockSkewSeconds: ${Auth__ClockSkewSeconds:-30}
+      Auth__RefreshCookieName: ${Auth__RefreshCookieName:-infraharbor_refresh}
+      Auth__SecureCookies: ${Auth__SecureCookies:-true}
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     depends_on:
