@@ -81,7 +81,12 @@ internal static class AuthEndpoints
         }
 
         var roles = result.Roles ?? [];
-        var access = tokenIssuer.Issue(result.UserId!.Value, result.Email!, result.DisplayName!, roles);
+        var access = tokenIssuer.Issue(
+            result.UserId!.Value,
+            result.Email!,
+            result.DisplayName!,
+            roles,
+            result.SecurityStamp!);
         WriteRefreshCookie(httpContext, authOptions.Value, result.RefreshToken!, result.RefreshExpiresAt!.Value);
 
         return Results.Ok(new
@@ -124,7 +129,12 @@ internal static class AuthEndpoints
         }
 
         var roles = result.Roles ?? [];
-        var access = tokenIssuer.Issue(result.UserId!.Value, result.Email!, result.DisplayName!, roles);
+        var access = tokenIssuer.Issue(
+            result.UserId!.Value,
+            result.Email!,
+            result.DisplayName!,
+            roles,
+            result.SecurityStamp!);
         WriteRefreshCookie(httpContext, options, result.RefreshToken!, result.RefreshExpiresAt!.Value);
 
         return Results.Ok(new

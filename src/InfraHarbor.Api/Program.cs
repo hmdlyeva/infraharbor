@@ -29,6 +29,7 @@ app.UseAuthorization();
 app.MapHealthChecks("/health/live");
 app.MapHealthChecks("/health/ready");
 app.MapAuthEndpoints();
+app.MapUserAdministrationEndpoints();
 
 app.MapGet("/", () => Results.Ok(new
 {

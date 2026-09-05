@@ -11,7 +11,14 @@ const services = [
   { name: "Checkout monitor", environment: "Production", state: "Degraded", detail: "2 failures" },
 ];
 
-const nav = ["Overview", "Servers", "Containers", "Monitors", "Incidents", "Deployments"];
+const baseNav = [
+  { label: "Overview", href: "/" },
+  { label: "Servers", href: "#" },
+  { label: "Containers", href: "#" },
+  { label: "Monitors", href: "#" },
+  { label: "Incidents", href: "#" },
+  { label: "Deployments", href: "#" },
+];
 
 function initials(displayName: string) {
   return displayName
@@ -52,6 +59,8 @@ export default function Home() {
   }
 
   const primaryRole = user.roles[0] ?? "Authenticated";
+  const canManageUsers = user.roles.includes("Owner") || user.roles.includes("Admin");
+  const nav = canManageUsers ? [...baseNav, { label: "Users", href: "/users" }] : baseNav;
 
   return (
     <main className="app-shell">
@@ -62,9 +71,9 @@ export default function Home() {
         </div>
         <div className="project-switcher"><span>Project</span><strong>Demo Platform</strong><small>Production</small></div>
         <nav aria-label="Primary navigation">
-          {nav.map((item, index) => (
-            <a className={index === 0 ? "nav-item active" : "nav-item"} href="#" key={item}>
-              <span className="nav-dot" />{item}
+          {nav.map((item) => (
+            <a className={item.label === "Overview" ? "nav-item active" : "nav-item"} href={item.href} key={item.label}>
+              <span className="nav-dot" />{item.label}
             </a>
           ))}
         </nav>
