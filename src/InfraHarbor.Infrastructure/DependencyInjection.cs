@@ -1,6 +1,8 @@
+using InfraHarbor.Application.Projects;
 using InfraHarbor.Application.Security;
 using InfraHarbor.Infrastructure.Identity;
 using InfraHarbor.Infrastructure.Persistence;
+using InfraHarbor.Infrastructure.Projects;
 using InfraHarbor.Infrastructure.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +40,14 @@ public static class DependencyInjection
         services.AddScoped<IAuthSessionService, AuthSessionService>();
         services.AddScoped<IUserAdministrationService, UserAdministrationService>();
         services.AddScoped<IUserAccessValidator, UserAccessValidator>();
+        return services;
+    }
+
+    public static IServiceCollection AddInfraHarborProjects(this IServiceCollection services)
+    {
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<IProjectService, ProjectService>();
         return services;
     }
 }
