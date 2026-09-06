@@ -102,6 +102,10 @@ export default function UsersPage() {
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loadingUsers) {
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -123,7 +127,6 @@ export default function UsersPage() {
       const withoutCreated = current.filter((item) => item.id !== created.id);
       return [...withoutCreated, created];
     });
-    setLoadingUsers(false);
     setEmail("");
     setDisplayName("");
     setPassword("");
@@ -209,8 +212,8 @@ export default function UsersPage() {
                 {manageableRoles.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
-            <button className="primary-button" disabled={submitting} type="submit">
-              {submitting ? "Creating…" : "Create user"}
+            <button className="primary-button" disabled={submitting || loadingUsers} type="submit">
+              {submitting ? "Creating…" : loadingUsers ? "Loading users…" : "Create user"}
             </button>
           </form>
           <p className="admin-help">Owner is intentionally not assignable here. Ownership transfer requires a separate explicit flow.</p>
