@@ -160,7 +160,7 @@ async function installUserAdminApiMock(page: Page) {
       }
       target.roles = body.roles;
       target.updatedAt = new Date().toISOString();
-      await route.fulfill({ status: 200, headers: corsHeaders(true), body: JSON.stringify(target) });
+      await route.fulfill({ status: 204, headers: corsHeaders(), body: "" });
       return;
     }
 
@@ -173,7 +173,7 @@ async function installUserAdminApiMock(page: Page) {
       }
       target.status = "Disabled";
       target.updatedAt = new Date().toISOString();
-      await route.fulfill({ status: 200, headers: corsHeaders(true), body: JSON.stringify(target) });
+      await route.fulfill({ status: 204, headers: corsHeaders(), body: "" });
       return;
     }
 
@@ -249,11 +249,24 @@ test("owner can create, re-role and disable a managed user from the browser UI",
 
   let row = page.locator(".admin-user-row", { hasText: "managed@infraharbor.test" });
   await expect(row).toBeVisible();
+
+  const roleMutation = page.waitForResponse((response) =>
+    response.url().endsWith("/api/users/33333333-3333-3333-3333-333333333333/roles") &&
+    response.request().method() === "POST",
+  );
   await row.getByLabel("Role for managed@infraharbor.test").selectOption("Admin");
+  expect((await roleMutation).status()).toBe(204);
+
   row = page.locator(".admin-user-row", { hasText: "managed@infraharbor.test" });
   await expect(row.getByLabel("Role for managed@infraharbor.test")).toHaveValue("Admin");
 
+  const disableMutation = page.waitForResponse((response) =>
+    response.url().endsWith("/api/users/33333333-3333-3333-3333-333333333333/disable") &&
+    response.request().method() === "POST",
+  );
   await row.getByRole("button", { name: "Disable" }).click();
+  expect((await disableMutation).status()).toBe(204);
+
   row = page.locator(".admin-user-row", { hasText: "managed@infraharbor.test" });
   await expect(row.getByText("Disabled", { exact: true })).toBeVisible();
 });
