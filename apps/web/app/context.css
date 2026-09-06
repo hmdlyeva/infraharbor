@@ -1,0 +1,156 @@
+.project-switcher {
+  gap: 10px;
+}
+
+.project-switcher label {
+  display: grid;
+  gap: 5px;
+}
+
+.project-switcher select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 7px;
+  background: #183149;
+  color: #edf4f8;
+  padding: 8px 9px;
+  font-size: 11px;
+  outline: none;
+}
+
+.project-switcher select:focus {
+  border-color: #9eb8cc;
+  box-shadow: 0 0 0 2px rgba(158, 184, 204, .16);
+}
+
+.project-switcher select:disabled {
+  opacity: .6;
+}
+
+.project-switcher small {
+  color: #aebdca;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.project-settings-link {
+  display: inline-flex;
+  justify-content: center;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 7px;
+  color: #c9d7e1;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.project-settings-link:hover {
+  background: rgba(255, 255, 255, .07);
+  color: #fff;
+}
+
+.context-summary {
+  max-width: 1320px;
+  margin: 0 auto 14px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(180px, .8fr) minmax(180px, .8fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.context-summary > div {
+  display: grid;
+  gap: 5px;
+}
+
+.context-summary > div strong {
+  font-size: 16px;
+}
+
+.context-summary > div small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.context-summary label,
+.settings-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+.context-summary label > span,
+.settings-grid label > span {
+  color: #344554;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.context-summary select,
+.settings-grid input,
+.settings-grid select,
+.settings-grid textarea {
+  width: 100%;
+  border: 1px solid #cfd7de;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 10px 11px;
+  outline: none;
+}
+
+.context-summary select:focus,
+.settings-grid input:focus,
+.settings-grid select:focus,
+.settings-grid textarea:focus {
+  border-color: #416885;
+  box-shadow: 0 0 0 3px rgba(65, 104, 133, .12);
+}
+
+.settings-grid {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.settings-grid textarea {
+  min-height: 88px;
+  resize: vertical;
+  font: inherit;
+}
+
+.settings-grid .admin-form {
+  display: grid;
+  gap: 14px;
+}
+
+.checkbox-field {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 9px !important;
+}
+
+.checkbox-field input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .context-summary,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}

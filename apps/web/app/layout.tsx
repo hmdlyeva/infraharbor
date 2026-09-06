@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "../lib/auth";
+import { ProjectContextProvider } from "../lib/project-context";
 import "./globals.css";
 import "./auth.css";
 import "./admin.css";
+import "./context.css";
 
 export const metadata: Metadata = {
   title: "InfraHarbor",
@@ -12,7 +14,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body><AuthProvider>{children}</AuthProvider></body>
+      <body>
+        <AuthProvider>
+          <ProjectContextProvider>{children}</ProjectContextProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
