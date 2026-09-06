@@ -172,7 +172,7 @@ public sealed class BrandingService(
         !ContainsUnsafeMarkup(value);
 
     private static bool ContainsUnsafeMarkup(string value) =>
-        value.Contains('<', StringComparison.Ordinal) || value.Contains('>', StringComparison.Ordinal);
+        value.Contains('<') || value.Contains('>');
 
     private static bool IsHexColor(string? value) =>
         !string.IsNullOrWhiteSpace(value) &&
