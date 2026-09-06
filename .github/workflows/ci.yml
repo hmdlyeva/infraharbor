@@ -85,6 +85,14 @@ jobs:
         run: dotnet build InfraHarbor.slnx --configuration Release --no-restore
       - name: Test
         run: dotnet test InfraHarbor.slnx --configuration Release --no-build --verbosity normal
+      - name: Diagnose integration test suite
+        if: failure()
+        continue-on-error: true
+        run: dotnet test tests/InfraHarbor.IntegrationTests/InfraHarbor.IntegrationTests.csproj --configuration Release --no-build --verbosity normal
+      - name: Diagnose unit test suite
+        if: failure()
+        continue-on-error: true
+        run: dotnet test tests/InfraHarbor.UnitTests/InfraHarbor.UnitTests.csproj --configuration Release --no-build --verbosity normal
       - name: Diagnose user administration tests
         if: failure()
         continue-on-error: true
@@ -101,5 +109,13 @@ jobs:
         if: failure()
         continue-on-error: true
         run: dotnet test tests/InfraHarbor.IntegrationTests/InfraHarbor.IntegrationTests.csproj --configuration Release --no-build --filter "FullyQualifiedName~BrowserCorsTests"
+      - name: Diagnose identity persistence tests
+        if: failure()
+        continue-on-error: true
+        run: dotnet test tests/InfraHarbor.IntegrationTests/InfraHarbor.IntegrationTests.csproj --configuration Release --no-build --filter "FullyQualifiedName~IdentityPersistenceTests"
+      - name: Diagnose owner bootstrap tests
+        if: failure()
+        continue-on-error: true
+        run: dotnet test tests/InfraHarbor.IntegrationTests/InfraHarbor.IntegrationTests.csproj --configuration Release --no-build --filter "FullyQualifiedName~OwnerBootstrapTests"
       - name: Verify EF model matches committed migrations
         run: dotnet ef migrations has-pending-model-changes --project src/InfraHarbor.Infrastructure --startup-project src/InfraHarbor.Api --configuration Release --no-build
