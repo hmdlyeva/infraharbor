@@ -14,6 +14,7 @@ var databaseOptions = new DatabaseOptions
 builder.Services.AddInfraHarborPersistence(databaseOptions.ConnectionString);
 builder.Services.AddInfraHarborIdentity();
 builder.Services.AddInfraHarborAuthentication(builder.Configuration);
+builder.Services.AddInfraHarborAuthorization();
 builder.Services.AddInfraHarborRateLimiting();
 builder.Services.AddHealthChecks();
 

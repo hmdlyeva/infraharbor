@@ -76,7 +76,11 @@ internal static class AuthEndpoints
                 statusCode: StatusCodes.Status401Unauthorized);
         }
 
-        var access = tokenIssuer.Issue(result.UserId!.Value, result.Email!, result.DisplayName!);
+        var access = tokenIssuer.Issue(
+            result.UserId!.Value,
+            result.Email!,
+            result.DisplayName!,
+            result.Roles ?? []);
         WriteRefreshCookie(httpContext, authOptions.Value, result.RefreshToken!, result.RefreshExpiresAt!.Value);
 
         return Results.Ok(new
@@ -88,7 +92,8 @@ internal static class AuthEndpoints
             {
                 id = result.UserId,
                 email = result.Email,
-                displayName = result.DisplayName
+                displayName = result.DisplayName,
+                roles = result.Roles ?? []
             }
         });
     }
@@ -117,7 +122,11 @@ internal static class AuthEndpoints
             return InvalidSession();
         }
 
-        var access = tokenIssuer.Issue(result.UserId!.Value, result.Email!, result.DisplayName!);
+        var access = tokenIssuer.Issue(
+            result.UserId!.Value,
+            result.Email!,
+            result.DisplayName!,
+            result.Roles ?? []);
         WriteRefreshCookie(httpContext, options, result.RefreshToken!, result.RefreshExpiresAt!.Value);
 
         return Results.Ok(new
@@ -129,7 +138,8 @@ internal static class AuthEndpoints
             {
                 id = result.UserId,
                 email = result.Email,
-                displayName = result.DisplayName
+                displayName = result.DisplayName,
+                roles = result.Roles ?? []
             }
         });
     }

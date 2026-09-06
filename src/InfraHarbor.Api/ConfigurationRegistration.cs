@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using InfraHarbor.Application;
@@ -13,8 +15,10 @@ internal static class AuthRateLimitPolicies
     public const string Refresh = "auth-refresh";
 }
 
-internal static class ConfigurationRegistration
+public static class ConfigurationRegistration
 {
+    public const string RoleClaimType = "role";
+
     public static IServiceCollection AddInfraHarborConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<RuntimeOptions>()
@@ -66,6 +70,7 @@ internal static class ConfigurationRegistration
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -76,11 +81,12 @@ internal static class ConfigurationRegistration
                     IssuerSigningKey = signingKey,
                     ValidateLifetime = true,
                     RequireExpirationTime = true,
+                    NameClaimType = JwtRegisteredClaimNames.Name,
+                    RoleClaimType = RoleClaimType,
                     ClockSkew = TimeSpan.FromSeconds(auth.ClockSkewSeconds)
                 };
             });
 
-        services.AddAuthorization();
         services.AddSingleton<JwtAccessTokenIssuer>();
         return services;
     }
