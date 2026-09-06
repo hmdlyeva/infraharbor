@@ -115,7 +115,7 @@ async function installUserAdminApiMock(page: Page) {
     },
   ];
 
-  await page.route(`${apiBase}/api/users**`, async (route) => {
+  await page.route(`${apiBase}/api/users/**`, async (route) => {
     const request = route.request();
     const url = new URL(request.url());
 
@@ -278,4 +278,5 @@ test("viewer cannot open user administration", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("heading", { name: "Infrastructure at a glance" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Users & roles" })).toHaveCount(0);
 });
