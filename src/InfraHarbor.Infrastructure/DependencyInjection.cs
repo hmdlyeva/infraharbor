@@ -1,6 +1,7 @@
 using InfraHarbor.Application.Security;
 using InfraHarbor.Infrastructure.Identity;
 using InfraHarbor.Infrastructure.Persistence;
+using InfraHarbor.Infrastructure.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +33,11 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<InfraHarborDbContext>();
 
         services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton<ISecurityAuditSink, LoggingSecurityAuditSink>();
         services.AddScoped<IOwnerBootstrapService, OwnerBootstrapService>();
         services.AddScoped<IAuthSessionService, AuthSessionService>();
+        services.AddScoped<IUserAdministrationService, UserAdministrationService>();
+        services.AddScoped<IUserAccessValidator, UserAccessValidator>();
         return services;
     }
 }

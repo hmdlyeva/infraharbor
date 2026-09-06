@@ -24,7 +24,8 @@ public sealed record AuthSessionResult(
     string? DisplayName = null,
     string? RefreshToken = null,
     DateTimeOffset? RefreshExpiresAt = null,
-    IReadOnlyList<string>? Roles = null);
+    IReadOnlyList<string>? Roles = null,
+    string? SecurityStamp = null);
 
 public interface IAuthSessionService
 {
@@ -33,4 +34,6 @@ public interface IAuthSessionService
     Task<AuthSessionResult> RefreshAsync(RefreshSessionCommand command, CancellationToken cancellationToken);
 
     Task RevokeAsync(string refreshToken, CancellationToken cancellationToken);
+
+    Task RevokeAllForUserAsync(Guid userId, CancellationToken cancellationToken);
 }

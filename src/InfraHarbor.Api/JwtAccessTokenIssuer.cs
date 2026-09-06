@@ -14,11 +14,14 @@ public sealed class JwtAccessTokenIssuer(
     IOptions<AuthOptions> authOptions,
     TimeProvider timeProvider)
 {
+    public const string SecurityStampClaimType = "ih:ss";
+
     public AccessTokenResult Issue(
         Guid userId,
         string email,
         string displayName,
-        IReadOnlyCollection<string> roles)
+        IReadOnlyCollection<string> roles,
+        string securityStamp)
     {
         var options = authOptions.Value;
         var now = timeProvider.GetUtcNow();
@@ -31,7 +34,8 @@ public sealed class JwtAccessTokenIssuer(
             new(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new(JwtRegisteredClaimNames.Email, email),
             new(JwtRegisteredClaimNames.Name, displayName),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(SecurityStampClaimType, securityStamp)
         };
 
         claims.AddRange(

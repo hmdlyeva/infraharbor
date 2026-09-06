@@ -1,4 +1,7 @@
 using InfraHarbor.Application.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace InfraHarbor.Api;
 
@@ -37,6 +40,7 @@ public static class AuthorizationRegistration
                     .RequireRole(RoleNames.Owner));
         });
 
+        services.Replace(ServiceDescriptor.Singleton<IAuthorizationMiddlewareResultHandler, SecurityAuditAuthorizationMiddlewareResultHandler>());
         return services;
     }
 }

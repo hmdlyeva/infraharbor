@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using InfraHarbor.Application;
+using InfraHarbor.Application.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
@@ -107,6 +108,33 @@ public static class ConfigurationRegistration
                     NameClaimType = JwtRegisteredClaimNames.Name,
                     RoleClaimType = ClaimTypes.Role,
                     ClockSkew = TimeSpan.FromSeconds(auth.ClockSkewSeconds)
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var validator = context.HttpContext.RequestServices.GetService<IUserAccessValidator>();
+                        if (validator is null)
+                        {
+                            return;
+                        }
+
+                        var subject = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                        var securityStamp = context.Principal?.FindFirst(JwtAccessTokenIssuer.SecurityStampClaimType)?.Value;
+                        if (!Guid.TryParse(subject, out var userId) || string.IsNullOrWhiteSpace(securityStamp))
+                        {
+                            context.Fail("session_invalid");
+                            return;
+                        }
+
+                        if (!await validator.IsAccessTokenValidAsync(
+                                userId,
+                                securityStamp,
+                                context.HttpContext.RequestAborted))
+                        {
+                            context.Fail("session_invalid");
+                        }
+                    }
                 };
             });
 

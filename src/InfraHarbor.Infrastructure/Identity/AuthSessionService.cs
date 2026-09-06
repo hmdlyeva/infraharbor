@@ -130,6 +130,16 @@ public sealed class AuthSessionService(
         await transaction.CommitAsync(cancellationToken);
     }
 
+    public async Task RevokeAllForUserAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var revokedAt = timeProvider.GetUtcNow();
+        await db.RefreshSessions
+            .Where(item => item.UserId == userId && item.RevokedAt == null)
+            .ExecuteUpdateAsync(
+                updates => updates.SetProperty(item => item.RevokedAt, revokedAt),
+                cancellationToken);
+    }
+
     private (RefreshSession Session, string RawToken) CreateSession(
         Guid userId,
         Guid familyId,
@@ -180,6 +190,7 @@ public sealed class AuthSessionService(
             .Where(role => RoleNames.All.Contains(role))
             .OrderBy(role => role, StringComparer.Ordinal)
             .ToArray();
+        var securityStamp = await userManager.GetSecurityStampAsync(user);
 
         return new AuthSessionResult(
             AuthSessionOutcome.Authenticated,
@@ -188,7 +199,8 @@ public sealed class AuthSessionService(
             user.DisplayName,
             refreshToken,
             refreshExpiresAt,
-            roles);
+            roles,
+            securityStamp);
     }
 
     private static AuthSessionResult Rejected() => new(AuthSessionOutcome.Rejected);

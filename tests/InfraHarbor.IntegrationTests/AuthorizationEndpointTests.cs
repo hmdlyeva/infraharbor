@@ -47,7 +47,8 @@ public sealed class AuthorizationEndpointTests
                 Guid.NewGuid(),
                 $"{role.ToLowerInvariant()}@infraharbor.test",
                 $"{role} User",
-                [role]);
+                [role],
+                "test-security-stamp");
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", access.Token);
