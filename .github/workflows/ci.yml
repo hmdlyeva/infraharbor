@@ -41,26 +41,6 @@ jobs:
         run: pnpm --filter @infraharbor/web exec playwright install --with-deps chromium
       - name: Browser auth E2E
         run: pnpm --filter @infraharbor/web test:e2e
-      - name: Diagnose unauthenticated shell E2E
-        if: failure()
-        continue-on-error: true
-        run: pnpm --filter @infraharbor/web exec playwright test --grep "unauthenticated user cannot access"
-      - name: Diagnose login persistence E2E
-        if: failure()
-        continue-on-error: true
-        run: pnpm --filter @infraharbor/web exec playwright test --grep "login opens the protected shell"
-      - name: Diagnose revoked refresh E2E
-        if: failure()
-        continue-on-error: true
-        run: pnpm --filter @infraharbor/web exec playwright test --grep "expired or revoked refresh session"
-      - name: Diagnose owner user-admin E2E
-        if: failure()
-        continue-on-error: true
-        run: pnpm --filter @infraharbor/web exec playwright test --grep "owner can create, re-role and disable"
-      - name: Diagnose viewer user-admin E2E
-        if: failure()
-        continue-on-error: true
-        run: pnpm --filter @infraharbor/web exec playwright test --grep "viewer cannot open user administration"
 
   dotnet:
     name: .NET validation
@@ -95,9 +75,7 @@ jobs:
         run: dotnet restore InfraHarbor.slnx
       - name: Build
         run: dotnet build InfraHarbor.slnx --configuration Release --no-restore
-      - name: Unit tests
-        run: dotnet test tests/InfraHarbor.UnitTests/InfraHarbor.UnitTests.csproj --configuration Release --no-build --verbosity normal
-      - name: Integration tests
-        run: dotnet test tests/InfraHarbor.IntegrationTests/InfraHarbor.IntegrationTests.csproj --configuration Release --no-build --verbosity normal
+      - name: Test
+        run: dotnet test InfraHarbor.slnx --configuration Release --no-build --verbosity normal
       - name: Verify EF model matches committed migrations
         run: dotnet ef migrations has-pending-model-changes --project src/InfraHarbor.Infrastructure --startup-project src/InfraHarbor.Api --configuration Release --no-build
