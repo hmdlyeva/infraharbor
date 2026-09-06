@@ -47,6 +47,8 @@ public static class DependencyInjection
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<IProjectEnvironmentRepository, ProjectEnvironmentRepository>();
+        services.AddScoped<IProjectEnvironmentService, ProjectEnvironmentService>();
         services.AddScoped<IProjectService, ProjectService>();
         return services;
     }
