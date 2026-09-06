@@ -17,7 +17,7 @@ export function ProjectEnvironmentSwitcher() {
   } = useProjectContext();
 
   return (
-    <div className="project-switcher" aria-label="Project and environment context">
+    <div className="project-switcher">
       <label>
         <span>Project</span>
         <select
