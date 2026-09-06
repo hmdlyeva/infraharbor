@@ -1,3 +1,4 @@
+using InfraHarbor.Domain.Projects;
 using InfraHarbor.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -9,6 +10,7 @@ public sealed class InfraHarborDbContext(DbContextOptions<InfraHarborDbContext> 
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
 {
     public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
+    public DbSet<Project> Projects => Set<Project>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -81,6 +83,38 @@ public sealed class InfraHarborDbContext(DbContextOptions<InfraHarborDbContext> 
                 .WithMany()
                 .HasForeignKey(session => session.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Project>(entity =>
+        {
+            entity.ToTable("Projects");
+            entity.HasKey(project => project.Id);
+
+            entity.Property(project => project.Name)
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(project => project.Slug)
+                .HasMaxLength(80)
+                .IsRequired();
+
+            entity.Property(project => project.Description)
+                .HasMaxLength(2000);
+
+            entity.Property(project => project.IsArchived)
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entity.Property(project => project.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .IsRequired();
+
+            entity.Property(project => project.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .IsRequired();
+
+            entity.HasIndex(project => project.Slug)
+                .IsUnique();
         });
 
         builder.Entity<IdentityUserLogin<Guid>>().Property(login => login.LoginProvider).HasMaxLength(128);
