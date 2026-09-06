@@ -52,8 +52,7 @@ public static class BrandingDefaults
 public interface IBrandingRepository
 {
     Task<BrandingSettings?> GetAsync(CancellationToken cancellationToken);
-    Task AddAsync(BrandingSettings settings, CancellationToken cancellationToken);
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    Task UpsertAsync(BrandingSettings settings, CancellationToken cancellationToken);
 }
 
 public interface IBrandingService

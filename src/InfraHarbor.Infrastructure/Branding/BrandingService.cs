@@ -51,25 +51,22 @@ public sealed class BrandingService(
             return new BrandingUpdateResult(BrandingUpdateOutcome.ValidationFailed, Errors: errors);
         }
 
-        var settings = await repository.GetAsync(cancellationToken);
-        if (settings is null)
+        var settings = new BrandingSettings
         {
-            settings = new BrandingSettings { Id = InstallationBrandingId };
-            await repository.AddAsync(settings, cancellationToken);
-        }
+            Id = InstallationBrandingId,
+            ProductName = productName,
+            ShortName = shortName,
+            LogoUrl = logoUrl,
+            FaviconUrl = faviconUrl,
+            PrimaryColor = primaryColor,
+            SupportUrl = supportUrl,
+            DocumentationUrl = documentationUrl,
+            FooterText = footerText,
+            LoginHeadline = loginHeadline,
+            UpdatedAt = timeProvider.GetUtcNow()
+        };
 
-        settings.ProductName = productName;
-        settings.ShortName = shortName;
-        settings.LogoUrl = logoUrl;
-        settings.FaviconUrl = faviconUrl;
-        settings.PrimaryColor = primaryColor;
-        settings.SupportUrl = supportUrl;
-        settings.DocumentationUrl = documentationUrl;
-        settings.FooterText = footerText;
-        settings.LoginHeadline = loginHeadline;
-        settings.UpdatedAt = timeProvider.GetUtcNow();
-        await repository.SaveChangesAsync(cancellationToken);
-
+        await repository.UpsertAsync(settings, cancellationToken);
         return new BrandingUpdateResult(BrandingUpdateOutcome.Success, ToView(settings));
     }
 
@@ -127,9 +124,16 @@ public sealed class BrandingService(
         ValidateUrl(errors, supportUrl, "Support URL");
         ValidateUrl(errors, documentationUrl, "Documentation URL");
 
-        if (loginHeadline is not null && loginHeadline.Length > LoginHeadlineMaxLength)
+        if (loginHeadline is not null)
         {
-            errors.Add($"Login headline cannot exceed {LoginHeadlineMaxLength} characters.");
+            if (loginHeadline.Length > LoginHeadlineMaxLength)
+            {
+                errors.Add($"Login headline cannot exceed {LoginHeadlineMaxLength} characters.");
+            }
+            else if (ContainsUnsafeMarkup(loginHeadline))
+            {
+                errors.Add("Login headline must be plain text and cannot contain markup.");
+            }
         }
 
         return errors;
@@ -137,9 +141,15 @@ public sealed class BrandingService(
 
     private static void ValidateRequiredText(List<string> errors, string value, int maxLength, string fieldName)
     {
-        if (value.Length is < 1 or > var _ && value.Length > maxLength)
+        if (value.Length < 1 || value.Length > maxLength)
         {
             errors.Add($"{fieldName} must be between 1 and {maxLength} characters.");
+            return;
+        }
+
+        if (ContainsUnsafeMarkup(value))
+        {
+            errors.Add($"{fieldName} must be plain text and cannot contain markup.");
         }
     }
 
@@ -157,7 +167,12 @@ public sealed class BrandingService(
     }
 
     private static bool IsTextValid(string? value, int maxLength) =>
-        !string.IsNullOrWhiteSpace(value) && value.Trim().Length <= maxLength;
+        !string.IsNullOrWhiteSpace(value) &&
+        value.Trim().Length <= maxLength &&
+        !ContainsUnsafeMarkup(value);
+
+    private static bool ContainsUnsafeMarkup(string value) =>
+        value.Contains('<', StringComparison.Ordinal) || value.Contains('>', StringComparison.Ordinal);
 
     private static bool IsHexColor(string? value) =>
         !string.IsNullOrWhiteSpace(value) &&
@@ -176,7 +191,7 @@ public sealed class BrandingService(
             : fallback;
 
     private static string? SafeStoredText(string? value, int maxLength, string? fallback) =>
-        NormalizeOptional(value) is { } normalized && normalized.Length <= maxLength
+        NormalizeOptional(value) is { } normalized && normalized.Length <= maxLength && !ContainsUnsafeMarkup(normalized)
             ? normalized
             : fallback;
 
