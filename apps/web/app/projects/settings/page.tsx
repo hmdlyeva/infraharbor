@@ -20,6 +20,11 @@ function mutationError(payload: unknown, fallback: string) {
   return fallback;
 }
 
+function textValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value : "";
+}
+
 export default function ProjectSettingsPage() {
   const router = useRouter();
   const { status: authStatus, user, authenticatedFetch } = useAuth();
@@ -42,17 +47,10 @@ export default function ProjectSettingsPage() {
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectSlug, setNewProjectSlug] = useState("");
   const [newProjectDescription, setNewProjectDescription] = useState("");
-  const [projectName, setProjectName] = useState("");
-  const [projectSlug, setProjectSlug] = useState("");
-  const [projectDescription, setProjectDescription] = useState("");
   const [newEnvironmentName, setNewEnvironmentName] = useState("");
   const [newEnvironmentKey, setNewEnvironmentKey] = useState("");
   const [newEnvironmentSortOrder, setNewEnvironmentSortOrder] = useState("40");
   const [newEnvironmentProduction, setNewEnvironmentProduction] = useState(false);
-  const [environmentName, setEnvironmentName] = useState("");
-  const [environmentKey, setEnvironmentKey] = useState("");
-  const [environmentSortOrder, setEnvironmentSortOrder] = useState("");
-  const [environmentProduction, setEnvironmentProduction] = useState(false);
 
   useEffect(() => {
     if (authStatus === "anonymous") {
@@ -61,19 +59,6 @@ export default function ProjectSettingsPage() {
       router.replace(contextHref("/"));
     }
   }, [authStatus, canManageHierarchy, contextHref, router]);
-
-  useEffect(() => {
-    setProjectName(selectedProject?.name ?? "");
-    setProjectSlug(selectedProject?.slug ?? "");
-    setProjectDescription(selectedProject?.description ?? "");
-  }, [selectedProject]);
-
-  useEffect(() => {
-    setEnvironmentName(selectedEnvironment?.name ?? "");
-    setEnvironmentKey(selectedEnvironment?.key ?? "");
-    setEnvironmentSortOrder(selectedEnvironment ? String(selectedEnvironment.sortOrder) : "");
-    setEnvironmentProduction(selectedEnvironment?.isProduction ?? false);
-  }, [selectedEnvironment]);
 
   if (authStatus !== "authenticated" || !user || !canManageHierarchy) {
     return (
@@ -126,15 +111,16 @@ export default function ProjectSettingsPage() {
       return;
     }
 
+    const formData = new FormData(event.currentTarget);
     setBusy(true);
     setError(null);
     const response = await authenticatedFetch(`/api/projects/${selectedProject.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: projectName,
-        slug: projectSlug,
-        description: projectDescription || null,
+        name: textValue(formData, "name"),
+        slug: textValue(formData, "slug"),
+        description: textValue(formData, "description") || null,
       }),
     });
 
@@ -216,16 +202,17 @@ export default function ProjectSettingsPage() {
       return;
     }
 
+    const formData = new FormData(event.currentTarget);
     setBusy(true);
     setError(null);
     const response = await authenticatedFetch(`/api/environments/${selectedEnvironment.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: environmentName,
-        key: environmentKey,
-        sortOrder: Number(environmentSortOrder),
-        isProduction: environmentProduction,
+        name: textValue(formData, "name"),
+        key: textValue(formData, "key"),
+        sortOrder: Number(textValue(formData, "sortOrder")),
+        isProduction: formData.get("isProduction") === "on",
       }),
     });
 
@@ -304,10 +291,10 @@ export default function ProjectSettingsPage() {
         <article className="panel">
           <div className="panel-heading"><div><span className="eyebrow">CURRENT PROJECT</span><h2>Project metadata</h2></div></div>
           {selectedProject ? (
-            <form className="admin-form" onSubmit={handleUpdateProject}>
-              <label><span>Name</span><input required maxLength={120} value={projectName} onChange={(event) => setProjectName(event.target.value)} /></label>
-              <label><span>Slug</span><input required maxLength={80} value={projectSlug} onChange={(event) => setProjectSlug(event.target.value)} /></label>
-              <label><span>Description</span><textarea maxLength={2000} value={projectDescription} onChange={(event) => setProjectDescription(event.target.value)} /></label>
+            <form className="admin-form" key={selectedProject.id} onSubmit={handleUpdateProject}>
+              <label><span>Name</span><input name="name" required maxLength={120} defaultValue={selectedProject.name} /></label>
+              <label><span>Slug</span><input name="slug" required maxLength={80} defaultValue={selectedProject.slug} /></label>
+              <label><span>Description</span><textarea name="description" maxLength={2000} defaultValue={selectedProject.description ?? ""} /></label>
               <div className="settings-actions">
                 <button className="primary-button" disabled={busy} type="submit">Save project</button>
                 <button className="secondary-danger-button" disabled={busy} type="button" onClick={() => void handleArchiveProject()}>Archive project</button>
@@ -332,11 +319,11 @@ export default function ProjectSettingsPage() {
         <article className="panel">
           <div className="panel-heading"><div><span className="eyebrow">CURRENT ENVIRONMENT</span><h2>Environment metadata</h2></div></div>
           {selectedEnvironment ? (
-            <form className="admin-form" onSubmit={handleUpdateEnvironment}>
-              <label><span>Name</span><input required maxLength={120} value={environmentName} onChange={(event) => setEnvironmentName(event.target.value)} /></label>
-              <label><span>Key</span><input required maxLength={64} value={environmentKey} onChange={(event) => setEnvironmentKey(event.target.value)} /></label>
-              <label><span>Sort order</span><input required min={0} type="number" value={environmentSortOrder} onChange={(event) => setEnvironmentSortOrder(event.target.value)} /></label>
-              <label className="checkbox-field"><input type="checkbox" checked={environmentProduction} onChange={(event) => setEnvironmentProduction(event.target.checked)} /><span>Production environment</span></label>
+            <form className="admin-form" key={selectedEnvironment.id} onSubmit={handleUpdateEnvironment}>
+              <label><span>Name</span><input name="name" required maxLength={120} defaultValue={selectedEnvironment.name} /></label>
+              <label><span>Key</span><input name="key" required maxLength={64} defaultValue={selectedEnvironment.key} /></label>
+              <label><span>Sort order</span><input name="sortOrder" required min={0} type="number" defaultValue={selectedEnvironment.sortOrder} /></label>
+              <label className="checkbox-field"><input name="isProduction" type="checkbox" defaultChecked={selectedEnvironment.isProduction} /><span>Production environment</span></label>
               <button className="primary-button" disabled={busy} type="submit">Save environment</button>
             </form>
           ) : <div className="admin-empty">No environment is selected.</div>}
