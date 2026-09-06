@@ -11,6 +11,7 @@ public sealed class InfraHarborDbContext(DbContextOptions<InfraHarborDbContext> 
 {
     public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectEnvironment> Environments => Set<ProjectEnvironment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -115,6 +116,45 @@ public sealed class InfraHarborDbContext(DbContextOptions<InfraHarborDbContext> 
 
             entity.HasIndex(project => project.Slug)
                 .IsUnique();
+        });
+
+        builder.Entity<ProjectEnvironment>(entity =>
+        {
+            entity.ToTable("Environments");
+            entity.HasKey(environment => environment.Id);
+
+            entity.Property(environment => environment.Name)
+                .HasMaxLength(120)
+                .IsRequired();
+
+            entity.Property(environment => environment.Key)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            entity.Property(environment => environment.SortOrder)
+                .IsRequired();
+
+            entity.Property(environment => environment.IsProduction)
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entity.Property(environment => environment.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .IsRequired();
+
+            entity.Property(environment => environment.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .IsRequired();
+
+            entity.HasIndex(environment => new { environment.ProjectId, environment.Key })
+                .IsUnique();
+
+            entity.HasIndex(environment => new { environment.ProjectId, environment.SortOrder });
+
+            entity.HasOne<Project>()
+                .WithMany()
+                .HasForeignKey(environment => environment.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Entity<IdentityUserLogin<Guid>>().Property(login => login.LoginProvider).HasMaxLength(128);
