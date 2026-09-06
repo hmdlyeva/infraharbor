@@ -14,6 +14,7 @@ var databaseOptions = new DatabaseOptions
 builder.Services.AddInfraHarborPersistence(databaseOptions.ConnectionString);
 builder.Services.AddInfraHarborIdentity();
 builder.Services.AddInfraHarborProjects();
+builder.Services.AddInfraHarborBranding();
 builder.Services.AddInfraHarborCors(builder.Configuration);
 builder.Services.AddInfraHarborAuthentication(builder.Configuration);
 builder.Services.AddInfraHarborAuthorization();
@@ -33,6 +34,7 @@ app.MapAuthEndpoints();
 app.MapUserAdministrationEndpoints();
 app.MapProjectEndpoints();
 app.MapEnvironmentEndpoints();
+app.MapBrandingEndpoints();
 
 app.MapGet("/", () => Results.Ok(new
 {

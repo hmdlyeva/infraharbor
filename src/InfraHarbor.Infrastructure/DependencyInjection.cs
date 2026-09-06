@@ -1,5 +1,7 @@
+using InfraHarbor.Application.Branding;
 using InfraHarbor.Application.Projects;
 using InfraHarbor.Application.Security;
+using InfraHarbor.Infrastructure.Branding;
 using InfraHarbor.Infrastructure.Identity;
 using InfraHarbor.Infrastructure.Persistence;
 using InfraHarbor.Infrastructure.Projects;
@@ -50,6 +52,14 @@ public static class DependencyInjection
         services.AddScoped<IProjectEnvironmentRepository, ProjectEnvironmentRepository>();
         services.AddScoped<IProjectEnvironmentService, ProjectEnvironmentService>();
         services.AddScoped<IProjectService, ProjectService>();
+        return services;
+    }
+
+    public static IServiceCollection AddInfraHarborBranding(this IServiceCollection services)
+    {
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<IBrandingRepository, BrandingRepository>();
+        services.AddScoped<IBrandingService, BrandingService>();
         return services;
     }
 }
