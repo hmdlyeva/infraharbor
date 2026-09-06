@@ -118,12 +118,17 @@ export default function UsersPage() {
       return;
     }
 
+    const created = (await response.json()) as ManagedUser;
+    setUsers((current) => {
+      const withoutCreated = current.filter((item) => item.id !== created.id);
+      return [...withoutCreated, created];
+    });
+    setLoadingUsers(false);
     setEmail("");
     setDisplayName("");
     setPassword("");
     setRole("Viewer");
     setSubmitting(false);
-    await loadUsers();
   }
 
   async function handleRoleChange(target: ManagedUser, nextRole: string) {
