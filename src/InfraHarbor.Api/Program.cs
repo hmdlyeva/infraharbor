@@ -32,6 +32,7 @@ app.MapHealthChecks("/health/ready");
 app.MapAuthEndpoints();
 app.MapUserAdministrationEndpoints();
 app.MapProjectEndpoints();
+app.MapEnvironmentEndpoints();
 
 app.MapGet("/", () => Results.Ok(new
 {
