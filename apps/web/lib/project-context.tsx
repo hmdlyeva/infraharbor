@@ -174,18 +174,20 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    if (authStatus === "authenticated") {
-      void reloadProjects();
+    if (authStatus !== "authenticated") {
       return;
     }
 
-    if (authStatus === "anonymous") {
-      setStatus("idle");
-      setProjects([]);
-      setEnvironments([]);
-      setSelectedProjectId(null);
-      setSelectedEnvironmentId(null);
-    }
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        void reloadProjects();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [authStatus, reloadProjects]);
 
   const selectProject = useCallback(
