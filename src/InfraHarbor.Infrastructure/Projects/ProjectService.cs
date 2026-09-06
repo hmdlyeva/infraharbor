@@ -8,6 +8,7 @@ namespace InfraHarbor.Infrastructure.Projects;
 
 public sealed class ProjectService(
     IProjectRepository repository,
+    IProjectEnvironmentRepository environmentRepository,
     TimeProvider timeProvider) : IProjectService
 {
     private const int MaxNameLength = 120;
@@ -58,6 +59,7 @@ public sealed class ProjectService(
         };
 
         await repository.AddAsync(project, cancellationToken);
+        await environmentRepository.AddRangeAsync(ProjectEnvironmentDefaults.Create(project.Id, now), cancellationToken);
         try
         {
             await repository.SaveChangesAsync(cancellationToken);
