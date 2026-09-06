@@ -2,13 +2,15 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ProjectEnvironmentSwitcher } from "../components/project-environment-switcher";
 import { useAuth } from "../lib/auth";
+import { useProjectContext } from "../lib/project-context";
 
 const services = [
-  { name: "Web API", environment: "Production", state: "Healthy", detail: "28 ms" },
-  { name: "Worker", environment: "Production", state: "Healthy", detail: "Online" },
-  { name: "PostgreSQL", environment: "Production", state: "Healthy", detail: "12 ms" },
-  { name: "Checkout monitor", environment: "Production", state: "Degraded", detail: "2 failures" },
+  { name: "Web API", state: "Healthy", detail: "28 ms" },
+  { name: "Worker", state: "Healthy", detail: "Online" },
+  { name: "PostgreSQL", state: "Healthy", detail: "12 ms" },
+  { name: "Checkout monitor", state: "Degraded", detail: "2 failures" },
 ];
 
 const baseNav = [
@@ -32,6 +34,7 @@ function initials(displayName: string) {
 export default function Home() {
   const router = useRouter();
   const { status, user, logout } = useAuth();
+  const { selectedProject, selectedEnvironment, contextHref } = useProjectContext();
 
   useEffect(() => {
     if (status === "anonymous") {
@@ -61,6 +64,9 @@ export default function Home() {
   const primaryRole = user.roles[0] ?? "Authenticated";
   const canManageUsers = user.roles.includes("Owner") || user.roles.includes("Admin");
   const nav = canManageUsers ? [...baseNav, { label: "Users", href: "/users" }] : baseNav;
+  const contextLabel = selectedProject && selectedEnvironment
+    ? `${selectedProject.name} / ${selectedEnvironment.name}`
+    : selectedProject?.name ?? "No project context";
 
   return (
     <main className="app-shell">
@@ -69,19 +75,22 @@ export default function Home() {
           <span className="brand-mark">IH</span>
           <div><strong>InfraHarbor</strong><span>Control plane</span></div>
         </div>
-        <div className="project-switcher"><span>Project</span><strong>Demo Platform</strong><small>Production</small></div>
+        <ProjectEnvironmentSwitcher />
         <nav aria-label="Primary navigation">
-          {nav.map((item) => (
-            <a className={item.label === "Overview" ? "nav-item active" : "nav-item"} href={item.href} key={item.label}>
-              <span className="nav-dot" />{item.label}
-            </a>
-          ))}
+          {nav.map((item) => {
+            const href = item.href === "#" ? "#" : contextHref(item.href);
+            return (
+              <a className={item.label === "Overview" ? "nav-item active" : "nav-item"} href={href} key={item.label}>
+                <span className="nav-dot" />{item.label}
+              </a>
+            );
+          })}
         </nav>
         <div className="sidebar-footer"><span>Open source · White-label</span><small>Foundation preview</small></div>
       </aside>
       <section className="workspace">
         <header className="topbar">
-          <div><span className="eyebrow">OPERATIONS / OVERVIEW</span><h1>Infrastructure at a glance</h1></div>
+          <div><span className="eyebrow">OPERATIONS / {contextLabel.toUpperCase()}</span><h1>Infrastructure at a glance</h1></div>
           <details className="user-menu">
             <summary className="user-chip" aria-label="Open current user menu">
               <span>{initials(user.displayName)}</span>
@@ -109,7 +118,7 @@ export default function Home() {
               {services.map((service) => (
                 <div className="service-row" key={service.name}>
                   <span className={service.state === "Healthy" ? "status-dot healthy" : "status-dot degraded"} />
-                  <div className="service-name"><strong>{service.name}</strong><small>{service.environment}</small></div>
+                  <div className="service-name"><strong>{service.name}</strong><small>{selectedEnvironment?.name ?? "No environment selected"}</small></div>
                   <span className={service.state === "Healthy" ? "status healthy-text" : "status degraded-text"}>{service.state}</span>
                   <span className="service-detail">{service.detail}</span>
                 </div>
