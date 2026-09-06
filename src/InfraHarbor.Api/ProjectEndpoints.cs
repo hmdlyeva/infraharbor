@@ -26,11 +26,11 @@ public static class ProjectEndpoints
     }
 
     private static async Task<IResult> ListAsync(
-        bool includeArchived,
+        bool? includeArchived,
         IProjectService service,
         CancellationToken cancellationToken)
     {
-        var projects = await service.ListAsync(includeArchived, cancellationToken);
+        var projects = await service.ListAsync(includeArchived ?? false, cancellationToken);
         return Results.Ok(projects);
     }
 
