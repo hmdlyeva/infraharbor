@@ -94,7 +94,7 @@ public static class UserAdministrationEndpoints
             new SetManagedUserRolesCommand(request.Roles ?? []),
             cancellationToken);
 
-        return ToMutationHttpResult(result);
+        return ToHttpResult(result);
     }
 
     private static async Task<IResult> DisableAsync(
@@ -109,7 +109,7 @@ public static class UserAdministrationEndpoints
         }
 
         var result = await service.DisableAsync(actorUserId, id, cancellationToken);
-        return ToMutationHttpResult(result);
+        return ToHttpResult(result);
     }
 
     private static bool TryGetActor(ClaimsPrincipal principal, out Guid actorUserId)
@@ -118,25 +118,6 @@ public static class UserAdministrationEndpoints
                       principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return Guid.TryParse(subject, out actorUserId);
     }
-
-    private static IResult ToMutationHttpResult(UserAdministrationResult result) =>
-        result.Outcome switch
-        {
-            UserAdministrationOutcome.Success => Results.NoContent(),
-            UserAdministrationOutcome.NotFound => Results.NotFound(new { code = "user_not_found" }),
-            UserAdministrationOutcome.Forbidden => Results.Forbid(),
-            UserAdministrationOutcome.Conflict => Results.Conflict(new
-            {
-                code = "user_conflict",
-                errors = result.Errors ?? []
-            }),
-            UserAdministrationOutcome.ValidationFailed => Results.BadRequest(new
-            {
-                code = "user_validation_failed",
-                errors = result.Errors ?? []
-            }),
-            _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
-        };
 
     private static IResult ToHttpResult(UserAdministrationResult result, bool created = false) =>
         result.Outcome switch
