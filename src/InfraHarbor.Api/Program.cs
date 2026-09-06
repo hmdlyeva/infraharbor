@@ -13,6 +13,7 @@ var databaseOptions = new DatabaseOptions
 
 builder.Services.AddInfraHarborPersistence(databaseOptions.ConnectionString);
 builder.Services.AddInfraHarborIdentity();
+builder.Services.AddInfraHarborProjects();
 builder.Services.AddInfraHarborCors(builder.Configuration);
 builder.Services.AddInfraHarborAuthentication(builder.Configuration);
 builder.Services.AddInfraHarborAuthorization();
@@ -30,6 +31,7 @@ app.MapHealthChecks("/health/live");
 app.MapHealthChecks("/health/ready");
 app.MapAuthEndpoints();
 app.MapUserAdministrationEndpoints();
+app.MapProjectEndpoints();
 
 app.MapGet("/", () => Results.Ok(new
 {
